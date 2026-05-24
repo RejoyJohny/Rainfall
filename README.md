@@ -1,12 +1,10 @@
 # Kerala Rainfall Prediction (JJAS & OND)
 
-This project focuses on **seasonal rainfall prediction for Kerala** using machine learning models (KNN, ELM, ANN) trained on historical climate data.
-
-The dataset is derived from NetCDF rainfall data and filtered using the **Kerala state boundary shapefile**.
+Seasonal rainfall prediction for Kerala using machine learning (KNN, ELM, ANN). The project works on preprocessed grid-wise seasonal totals (JJAS and OND) and includes spatial visualizations masked to Kerala's boundary.
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```text
 Rainfall/
@@ -18,10 +16,11 @@ Rainfall/
 │
 ├── JJAS.ipynb
 ├── OND.ipynb
-│
-├── ne_10m_admin_1_states_provinces/
-│   ├── .shp, .shx, .dbf, .prj
-│
+├── JJAS_with_OND.ipynb
+├── OND_with_JJAS.ipynb
+├── JJAS ensemble.ipynb
+├── seasonal_detrending.ipynb
+├── ne_10m_admin_1_states_provinces/  (shapefile)
 └── README.md
 ```
 
@@ -108,7 +107,24 @@ ne_10m_admin_1_states_provinces/
 
 ---
 
-##  Dataset Format
+## Notebooks
+
+- `JJAS.ipynb` — JJAS-only experiments and visualization
+- `OND.ipynb` — OND-only experiments and visualization
+- `JJAS_with_OND.ipynb` — JJAS prediction using previous OND features
+- `OND_with_JJAS.ipynb` — OND prediction using same-year JJAS features
+- `JJAS ensemble.ipynb` — ensemble/combined analyses
+- `seasonal_detrending.ipynb` — detrending and signal processing
+- `data/data_preprocessing.ipynb` — regenerate CSVs from NetCDF
+
+---
+
+## Data
+
+- Preprocessed CSVs: `data/kerala_jjas.csv`, `data/kerala_ond.csv`
+- Shapefile folder: `ne_10m_admin_1_states_provinces/` (place the extracted Natural Earth admin-1 files here)
+
+Dataset format (per-row):
 
 ```text
 LATITUDE | LONGITUDE | YEAR | SEASON_SUM
@@ -119,19 +135,28 @@ LATITUDE | LONGITUDE | YEAR | SEASON_SUM
 
 ---
 
-##  Models Used
+## Models & Hyperparameters (used in notebooks)
 
-* KNN (K-Nearest Neighbors)
-* ELM (Extreme Learning Machine)
-* ANN (Artificial Neural Network)
+- **KNN**: `n_neighbors=5`, `metric='euclidean'`, `weights='uniform'`
+- **ELM (Extreme Learning Machine)**: `n_hidden=15`, `activation='sigmoid'`, `alpha=1e-3`, `random_state=42`
+- **ANN (Radial-Basis + LM trainer)**: `hidden_size=20`, radial-basis activation, `LM damping=1.0`, `max_iters=20–50` (varies by notebook), `torch.manual_seed(42)`
+
+If you want these exposed or changed, open the model definition cells in the notebooks and edit the parameters at the top of the training sections.
 
 ---
-##  Features
 
-* Grid-wise rainfall modeling
-* Time-series prediction (sliding window)
-* Seasonal forecasting
-* Spatial visualization using shapefile
+## Recent Fixes (May 2026)
+
+- Placed colorbars in a dedicated right-side axis (`cax`) and reserved figure space in `JJAS_with_OND.ipynb` and `OND_with_JJAS.ipynb` to avoid Matplotlib `tight_layout` warnings.
+- Fixed a `NameError: Tuple` in `OND_with_JJAS.ipynb` by adding `from typing import Tuple` to the imports.
+
+---
+
+## How to run
+
+- Start Jupyter: `jupyter lab` or `jupyter notebook` and open the desired notebook.
+- Run preprocessing only if you need to recreate `data/*.csv` from NetCDF.
+- Visualizations require the shapefile folder to be present to mask maps to Kerala.
 
 ---
 
